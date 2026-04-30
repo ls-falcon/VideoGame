@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class enemyMovement : MonoBehaviour
@@ -49,5 +50,18 @@ public class enemyMovement : MonoBehaviour
             // Si llegó al jugador, ponemos Movs en 0 para que pase a Idle
             animator.SetFloat("Movs", 0f);
         }
+    }
+
+    public Action OnDeath;
+
+    public void Die()
+    {
+        OnDeath.Invoke();
+        Destroy(gameObject);
+    }
+
+    public void setTarget(Transform target)
+    {
+        playerPosition = target;
     }
 }

@@ -22,6 +22,14 @@ public class playerMovementController : MonoBehaviour
     [SerializeField] private float groundRadius = 0.2f;
     [SerializeField] private LayerMask groundMask;
 
+    [Header("Ataque a enemigos")]
+    [SerializeField] private Transform attackPoint;
+    [SerializeField] private float attackRadius = 0.5f;
+    [SerializeField] private LayerMask enemyLayer;
+    private Vector3 originalAttackPointPos;
+    private bool isAttacking = false;
+
+
     private float moveX;
 
     private void Awake()
@@ -30,6 +38,7 @@ public class playerMovementController : MonoBehaviour
         playerInput.Player.Enable();
 
         playerInput.Player.Jump.performed += OnJump;
+        playerInput.Player.Attack.performed += OnAttack;
 
         // Inicializamos los componentes
         animator = GetComponent<Animator>();
@@ -40,6 +49,7 @@ public class playerMovementController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         rb.freezeRotation = true;
+        originalAttackPointPos = attackPoint.localPosition;
     }
 
     private void Update()
@@ -62,6 +72,15 @@ public class playerMovementController : MonoBehaviour
         {
             spriteRenderer.flipX = true; // Izquierda
         }
+
+        // Ajusta el punto de ataque según la dirección del jugador
+        float direction = spriteRenderer.flipX ? -1f : 1f;
+
+        attackPoint.localPosition = new Vector3(
+            direction * Mathf.Abs(originalAttackPointPos.x),
+            originalAttackPointPos.y,
+            originalAttackPointPos.z
+        );
     }
 
     private void FixedUpdate()
@@ -86,5 +105,49 @@ public class playerMovementController : MonoBehaviour
         {
             jumpPressed = true;
         }
+    }
+
+    void OnAttack(InputAction.CallbackContext ctx)
+    {
+        Attack();
+    }
+
+    public void DealDamage()
+    {
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
+            attackPoint.position,
+            attackRadius,
+            enemyLayer
+        );
+
+        foreach (Collider2D enemyCollider in hitEnemies)
+        {
+            enemyMovement enemy = enemyCollider.GetComponent<enemyMovement>();
+            if (enemy != null)
+            {
+                enemy.Die();
+            }
+        }
+    }
+
+    void Attack()
+    {
+        if (isAttacking) return;
+
+        isAttacking = true;
+        animator.SetTrigger("Attack");
+    }
+
+    public void EndAttack()
+    {
+        isAttacking = false;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (attackPoint == null) return;
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPoint.position, attackRadius);
     }
 }

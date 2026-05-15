@@ -163,10 +163,11 @@ MonoBehaviour:
   attackRadius: 0.3
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 512
   sword: {fileID: 2049059259}
   swordHolder: {fileID: 449759101}
   pullSpeed: 15
+  momentumDecay: 15
 --- !u!50 &94811673
 Rigidbody2D:
   serializedVersion: 5

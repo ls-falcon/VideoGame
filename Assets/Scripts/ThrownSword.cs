@@ -12,22 +12,39 @@ public class ThrownSword : MonoBehaviour
     [SerializeField] private float throwForce = 3f;
     private Collider2D playerCollider;
     private Collider2D swordCollider;
+    private Vector3 stuckOffset;
     public bool IsThrown { get; private set; }
     private float currentRotationDirection = 1f;
 
     private void Update()
     {
+        if (stuckInEnemy)
+        {
+            if (stuckTarget != null)
+            {
+                transform.position = stuckTarget.position + stuckOffset;
+            }
+            else
+            {
+                // El enemigo fue destruido
+                stuckInEnemy = false;
+
+                rb.bodyType = RigidbodyType2D.Dynamic;
+                rb.simulated = true;
+            }
+        }
+
         if (
             IsThrown &&
             !stuckInEnemy &&
             rb.linearVelocity.magnitude > 0.5f
         )
-                {
-                    transform.Rotate(
-                        0,
-                        0,
-                        rotationSpeed * currentRotationDirection * Time.deltaTime
-                    );
+        {
+            transform.Rotate(
+                0,
+                0,
+                rotationSpeed * currentRotationDirection * Time.deltaTime
+            );
         }
     }
 
@@ -36,9 +53,9 @@ public class ThrownSword : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
 
-        swordCollider = GetComponent<Collider2D>();
+        rb.freezeRotation = true;
 
-        
+        swordCollider = GetComponent<Collider2D>();
     }
 
     public void SetPlayerCollider(Collider2D collider)
@@ -59,10 +76,14 @@ public class ThrownSword : MonoBehaviour
         rb.simulated = true;
         rb.bodyType = RigidbodyType2D.Dynamic;
 
+        rb.constraints = RigidbodyConstraints2D.None;
+
         rb.linearVelocity = Vector2.zero;
 
         rb.AddForce(direction * throwForce, ForceMode2D.Impulse);
+
         currentRotationDirection = direction.x < 0 ? -1f : 1f;
+
         Physics2D.IgnoreCollision(
             swordCollider,
             playerCollider,
@@ -76,26 +97,34 @@ public class ThrownSword : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            // Buscamos el Rigidbody2D del enemigo para poder moverlo físicamente
             Rigidbody2D enemyRb = collision.gameObject.GetComponent<Rigidbody2D>();
+
             if (enemyRb != null)
             {
-                // Calculamos la dirección del impacto usando la velocidad que llevaba la espada
                 Vector2 pushDirection = rb.linearVelocity.normalized;
-
-                // Le aplicamos un impulso físico al enemigo (puedes cambiar el 5f para darle más o menos fuerza)
                 enemyRb.AddForce(pushDirection * 1f, ForceMode2D.Impulse);
             }
 
-            // --- Tu lógica original para clavar la espada ---
             stuckInEnemy = true;
             stuckTarget = collision.transform;
 
-            rb.linearVelocity = Vector2.zero;
-            rb.bodyType = RigidbodyType2D.Kinematic;
+            stuckOffset = collision.GetContact(0).point - (Vector2)stuckTarget.position;
 
-            transform.parent = stuckTarget;
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.simulated = false;
+
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
+    }
+    public void DetachFromEnemy()
+    {
+        stuckInEnemy = false;
+        stuckTarget = null;
+
+        rb.bodyType = RigidbodyType2D.Dynamic;
     }
 
     public void AttachToPlayer(Transform swordHolder)

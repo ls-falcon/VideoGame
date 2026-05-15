@@ -223,7 +223,7 @@ public class playerMovementController : MonoBehaviour
 
     void OnAttack(InputAction.CallbackContext ctx)
     {
-        if (pullingToSword) return;
+        //if (pullingToSword) return;
         Attack();
     }
 

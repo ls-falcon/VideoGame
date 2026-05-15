@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 6750393560171609517}
   - component: {fileID: 4443462491256076023}
   - component: {fileID: 5200639454723841850}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: EnemyWar
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 3
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7384290322352760091, guid: ed246dc7a09dd8d4887c612361e6f165, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

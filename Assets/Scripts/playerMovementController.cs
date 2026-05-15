@@ -12,6 +12,7 @@ public class playerMovementController : MonoBehaviour
 
     private bool isGrounded;
     private bool jumpPressed = false;
+    private float originalGravity;
 
     [Header("Configuración de Movimiento")]
     [SerializeField] private float playerSpeed = 4f;
@@ -32,6 +33,16 @@ public class playerMovementController : MonoBehaviour
 
     private float moveX;
 
+    [Header("Sword Throw")]
+    [SerializeField] private ThrownSword sword;
+    [SerializeField] private Transform swordHolder;
+    [SerializeField] private float pullSpeed = 15f;
+    [SerializeField] private float momentumDecay = 15f; // Qué tan rápido pierde el impulso en el aire
+
+    private Vector2 savedVelocity;
+    private bool pullingToSword = false;
+    private bool hasPullMomentum = false; // <--- NUEVA VARIABLE
+
     private void Awake()
     {
         playerInput = new PlayerInputSystem();
@@ -39,6 +50,7 @@ public class playerMovementController : MonoBehaviour
 
         playerInput.Player.Jump.performed += OnJump;
         playerInput.Player.Attack.performed += OnAttack;
+        playerInput.Player.ThrowSword.performed += OnThrowSword;
 
         // Inicializamos los componentes
         animator = GetComponent<Animator>();
@@ -49,6 +61,10 @@ public class playerMovementController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         rb.freezeRotation = true;
+
+        originalGravity = rb.gravityScale;
+        sword.SetPlayerCollider(GetComponent<Collider2D>());
+
         originalAttackPointPos = attackPoint.localPosition;
     }
 
@@ -66,14 +82,14 @@ public class playerMovementController : MonoBehaviour
         // Voltear el sprite según la dirección
         if (moveX > 0)
         {
-            spriteRenderer.flipX = false; // Derecha (Default)
+            spriteRenderer.flipX = false;
         }
         else if (moveX < 0)
         {
-            spriteRenderer.flipX = true; // Izquierda
+            spriteRenderer.flipX = true;
         }
 
-        // Ajusta el punto de ataque según la dirección del jugador
+        // Ajusta el punto de ataque segun la direccion del jugador
         float direction = spriteRenderer.flipX ? -1f : 1f;
 
         attackPoint.localPosition = new Vector3(
@@ -85,12 +101,42 @@ public class playerMovementController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (pullingToSword)
+        {
+            Vector2 direction = (sword.transform.position - transform.position).normalized;
+            rb.linearVelocity = direction * pullSpeed;
+
+            float distance = Vector2.Distance(transform.position, sword.transform.position);
+            if (distance < 1f)
+            {
+                RecoverSword();
+            }
+            return;
+        }
+
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundMask);
 
-        // Nota: En versiones recientes de Unity se usa rb.linearVelocity 
-        // Si usas una versión anterior, cámbialo a rb.velocity
-        rb.linearVelocity = new Vector2(moveX * playerSpeed, rb.linearVelocity.y);
+        // Si toca el suelo, el momentum se detiene inmediatamente
+        if (isGrounded)
+        {
+            hasPullMomentum = false;
+        }
 
+        // --- MANEJO DE VELOCIDAD HORIZONTAL ---
+        if (hasPullMomentum)
+        {
+            // El impulso del pull decae gradualmente hacia la velocidad objetivo del jugador (moveX * playerSpeed)
+            float targetX = moveX * playerSpeed;
+            float newX = Mathf.MoveTowards(rb.linearVelocity.x, targetX, momentumDecay * Time.fixedDeltaTime);
+            rb.linearVelocity = new Vector2(newX, rb.linearVelocity.y);
+        }
+        else
+        {
+            // Movimiento normal en suelo o aire sin momentum
+            rb.linearVelocity = new Vector2(moveX * playerSpeed, rb.linearVelocity.y);
+        }
+
+        // --- LÓGICA DE SALTO ---
         if (jumpPressed && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
@@ -98,9 +144,77 @@ public class playerMovementController : MonoBehaviour
         }
     }
 
+    void OnThrowSword(InputAction.CallbackContext ctx)
+    {
+        if (pullingToSword)
+        {
+            CancelPull();
+            return;
+        }
+
+        if (!sword.IsThrown)
+        {
+            ThrowSword();
+        }
+        else
+        {
+            PullPlayerToSword();
+        }
+    }
+
+    void CancelPull()
+    {
+        pullingToSword = false;
+        rb.gravityScale = originalGravity;
+
+        // Activamos el momentum para que no frene en seco
+        hasPullMomentum = true;
+
+        // BORRAMOS O COMENTAMOS ESTA LÍNEA:
+        // rb.linearVelocity = savedVelocity; 
+    }
+
+    void RecoverSword()
+    {
+        pullingToSword = false;
+        rb.gravityScale = originalGravity;
+        animator.SetBool("NoSword", false);
+        sword.AttachToPlayer(swordHolder);
+
+        // OPCIONAL: Si también quieres que salga disparado con inercia 
+        // al llegar con éxito a la espada, activa esto aquí también:
+        hasPullMomentum = true;
+    }
+
+    void ThrowSword()
+    {
+
+
+        Vector2 direction = spriteRenderer.flipX
+            ? Vector2.left
+            : Vector2.right;
+
+        sword.Throw(direction);
+        animator.SetBool("NoSword", true);
+    }
+
+    void PullPlayerToSword()
+    {
+        if (sword == null || !sword.IsThrown) return;
+
+        
+
+        pullingToSword = true;
+
+        rb.gravityScale = 0;
+    }
+
+   
+
     void OnJump(InputAction.CallbackContext ctx)
     {
         // Solo permitimos marcar el salto si estamos tocando el suelo
+        if (pullingToSword) return;
         if (isGrounded)
         {
             jumpPressed = true;
@@ -109,6 +223,7 @@ public class playerMovementController : MonoBehaviour
 
     void OnAttack(InputAction.CallbackContext ctx)
     {
+        //if (pullingToSword) return;
         Attack();
     }
 

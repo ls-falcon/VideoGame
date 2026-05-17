@@ -14,6 +14,8 @@ public class ThrownSword : MonoBehaviour
     private Collider2D swordCollider;
     private Vector3 stuckOffset;
     public bool IsThrown { get; private set; }
+    public float ThrowForce => throwForce;
+    public float GravityScale => rb != null ? rb.gravityScale : 1f;
     private float currentRotationDirection = 1f;
 
     private void Update()
@@ -65,6 +67,11 @@ public class ThrownSword : MonoBehaviour
 
     public void Throw(Vector2 direction)
     {
+        Throw(direction, throwForce);
+    }
+
+    public void Throw(Vector2 direction, float force)
+    {
         IsThrown = true;
 
         sr.enabled = true;
@@ -80,7 +87,7 @@ public class ThrownSword : MonoBehaviour
 
         rb.linearVelocity = Vector2.zero;
 
-        rb.AddForce(direction * throwForce, ForceMode2D.Impulse);
+        rb.AddForce(direction * force, ForceMode2D.Impulse);
 
         currentRotationDirection = direction.x < 0 ? -1f : 1f;
 

@@ -14,11 +14,11 @@ public class playerMovementController : MonoBehaviour
     private bool jumpPressed = false;
     private float originalGravity;
 
-    [Header("Configuración de Movimiento")]
+    [Header("Configuraciï¿½n de Movimiento")]
     [SerializeField] private float playerSpeed = 4f;
     [SerializeField] private float jumpForce = 6f;
 
-    [Header("Detección de Suelo")]
+    [Header("Detecciï¿½n de Suelo")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundRadius = 0.2f;
     [SerializeField] private LayerMask groundMask;
@@ -37,7 +37,7 @@ public class playerMovementController : MonoBehaviour
     [SerializeField] private ThrownSword sword;
     [SerializeField] private Transform swordHolder;
     [SerializeField] private float pullSpeed = 15f;
-    [SerializeField] private float momentumDecay = 15f; // Qué tan rápido pierde el impulso en el aire
+    [SerializeField] private float momentumDecay = 15f; // Quï¿½ tan rï¿½pido pierde el impulso en el aire
 
     private Vector2 savedVelocity;
     private bool pullingToSword = false;
@@ -72,14 +72,14 @@ public class playerMovementController : MonoBehaviour
     {
         moveX = playerInput.Player.HorizontalMovement.ReadValue<float>();
 
-        // --- Lógica de Animación y Flip ---
+        // --- Lï¿½gica de Animaciï¿½n y Flip ---
 
         // Usamos Mathf.Abs para que si moveX es -1, se convierta en 1.
-        // Así el parámetro "Movs" siempre refleja si hay movimiento.
+        // Asï¿½ el parï¿½metro "Movs" siempre refleja si hay movimiento.
         float movsValue = Mathf.Abs(moveX);
         animator.SetFloat("Movs", movsValue);
 
-        // Voltear el sprite según la dirección
+        // Voltear el sprite segï¿½n la direcciï¿½n
         if (moveX > 0)
         {
             spriteRenderer.flipX = false;
@@ -136,7 +136,7 @@ public class playerMovementController : MonoBehaviour
             rb.linearVelocity = new Vector2(moveX * playerSpeed, rb.linearVelocity.y);
         }
 
-        // --- LÓGICA DE SALTO ---
+        // --- Lï¿½GICA DE SALTO ---
         if (jumpPressed && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
@@ -170,7 +170,7 @@ public class playerMovementController : MonoBehaviour
         // Activamos el momentum para que no frene en seco
         hasPullMomentum = true;
 
-        // BORRAMOS O COMENTAMOS ESTA LÍNEA:
+        // BORRAMOS O COMENTAMOS ESTA Lï¿½NEA:
         // rb.linearVelocity = savedVelocity; 
     }
 
@@ -181,8 +181,8 @@ public class playerMovementController : MonoBehaviour
         animator.SetBool("NoSword", false);
         sword.AttachToPlayer(swordHolder);
 
-        // OPCIONAL: Si también quieres que salga disparado con inercia 
-        // al llegar con éxito a la espada, activa esto aquí también:
+        // OPCIONAL: Si tambiï¿½n quieres que salga disparado con inercia 
+        // al llegar con ï¿½xito a la espada, activa esto aquï¿½ tambiï¿½n:
         hasPullMomentum = true;
     }
 

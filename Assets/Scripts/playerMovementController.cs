@@ -30,7 +30,7 @@ public class playerMovementController : MonoBehaviour
     private Vector3 originalAttackPointPos;
     private bool isAttacking = false;
 
-
+    public PlayerInputSystem Input => playerInput;
     private float moveX;
 
     [Header("Sword Throw")]
@@ -43,12 +43,22 @@ public class playerMovementController : MonoBehaviour
     [SerializeField] private float maxThrowForce = 12f;
     [SerializeField] private float chargeTimeToMax = 1.2f;
 
-    private Vector2 savedVelocity;
+    
     private bool pullingToSword = false;
     private bool hasPullMomentum = false; // <--- NUEVA VARIABLE
     private bool isAiming = false;
     private Vector2 aimDirection = Vector2.right;
     private float aimCharge = 0f;
+
+    [HideInInspector] public float MeleeAttackSpeedMultiplier = 1f;
+    [HideInInspector] public float SwordAttackSpeedMultiplier = 1f;
+
+    [HideInInspector] public int MeleeDamage = 1;
+    [HideInInspector] public int SwordDamage = 1;
+    [HideInInspector] public float SwordThrowForceMultiplier = 1f;
+
+    private bool canDoubleJump = false;
+    private bool hasUsedDoubleJump = false;
 
     private void Awake()
     {
@@ -172,6 +182,16 @@ public class playerMovementController : MonoBehaviour
         }
     }
 
+    public void EnableDoubleJump()
+    {
+        canDoubleJump = true;
+    }
+
+    public void AddMoveSpeed(float amount)
+    {
+        playerSpeed += amount;
+    }
+
     void OnThrowSwordPressed(InputAction.CallbackContext ctx)
     {
         if (pullingToSword)
@@ -234,7 +254,9 @@ public class playerMovementController : MonoBehaviour
             return;
         }
 
-        float force = Mathf.Lerp(minThrowForce, maxThrowForce, aimCharge);
+        float force =
+        Mathf.Lerp(minThrowForce, maxThrowForce, aimCharge)
+        * SwordThrowForceMultiplier;
 
         sword.Throw(aimDirection, force);
         animator.SetBool("NoSword", true);
@@ -279,7 +301,9 @@ public class playerMovementController : MonoBehaviour
 
         if (swordAimUI != null)
         {
-            float force = Mathf.Lerp(minThrowForce, maxThrowForce, aimCharge);
+            float force =
+            Mathf.Lerp(minThrowForce, maxThrowForce, aimCharge)
+            * SwordThrowForceMultiplier;
 
             swordAimUI.UpdateAim(
                 startPosition,
@@ -334,15 +358,23 @@ public class playerMovementController : MonoBehaviour
         rb.gravityScale = 0;
     }
 
-   
+
 
     void OnJump(InputAction.CallbackContext ctx)
     {
-        // Solo permitimos marcar el salto si estamos tocando el suelo
         if (pullingToSword) return;
+
         if (isGrounded)
         {
             jumpPressed = true;
+            hasUsedDoubleJump = false;
+        }
+        else if (canDoubleJump && !hasUsedDoubleJump)
+        {
+            rb.linearVelocity =
+                new Vector2(rb.linearVelocity.x, jumpForce);
+
+            hasUsedDoubleJump = true;
         }
     }
 
@@ -375,12 +407,17 @@ public class playerMovementController : MonoBehaviour
         if (isAttacking) return;
 
         isAttacking = true;
+
+        animator.speed = MeleeAttackSpeedMultiplier;
+
         animator.SetTrigger("Attack");
     }
 
     public void EndAttack()
     {
         isAttacking = false;
+
+        animator.speed = 1f;
     }
 
     private void OnDrawGizmosSelected()

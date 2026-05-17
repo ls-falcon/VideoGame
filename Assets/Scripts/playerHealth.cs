@@ -12,6 +12,7 @@ public class playerHealth : MonoBehaviour
     private bool isDead = false;
     private Rigidbody2D rb; //1
     private SpriteRenderer spriteRenderer; //2
+    public int CurrentHearts => currentHearts;
 
     [SerializeField] private float invulnerabilityTime = 0.7f;
 
@@ -70,6 +71,21 @@ public class playerHealth : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
 
         rb.AddForce(direction * 7f, ForceMode2D.Impulse);
+    }
+
+    public void TakeDirectDamage(int amount)
+    {
+        if (isDead)
+            return;
+
+        currentHearts = Mathf.Max(0, currentHearts - amount);
+
+        OnHealthChanged?.Invoke(currentHearts, maxHearts);
+
+        if (currentHearts <= 0)
+        {
+            Die();
+        }
     }
 
     private System.Collections.IEnumerator FlashDamage()

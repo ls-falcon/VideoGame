@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class playerMovementController : MonoBehaviour
+public class PlayerMovementController : MonoBehaviour
 {
     private PlayerInputSystem playerInput;
     private Rigidbody2D rb;
@@ -394,7 +394,7 @@ public class playerMovementController : MonoBehaviour
 
         foreach (Collider2D enemyCollider in hitEnemies)
         {
-            enemyMovement enemy = enemyCollider.GetComponent<enemyMovement>();
+            EnemyMovement enemy = enemyCollider.GetComponent<EnemyMovement>();
             if (enemy != null)
             {
                 enemy.Die();

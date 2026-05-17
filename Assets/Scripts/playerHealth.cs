@@ -2,9 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
-public class playerHealth : MonoBehaviour
+public class PlayerHealth : MonoBehaviour
 {
     [SerializeField] private int maxHearts;
     [SerializeField] private int currentHearts;
@@ -24,9 +23,9 @@ public class playerHealth : MonoBehaviour
 
     private void Start()
     {
-        if (gameManager.Instance != null && gameManager.Instance.currentDifficulty != null)
+        if (GameManager.Instance != null && GameManager.Instance.currentDifficulty != null)
         {
-            maxHearts = gameManager.Instance.currentDifficulty.maxInitialHearts;
+            maxHearts = GameManager.Instance.currentDifficulty.maxInitialHearts;
         }
 
         currentHearts = maxHearts;
@@ -51,8 +50,6 @@ public class playerHealth : MonoBehaviour
         StartCoroutine(InvulnerabilityCoroutine());
 
         OnHealthChanged?.Invoke(currentHearts, maxHearts);
-
-
 
         if (currentHearts <= 0)
         {
@@ -136,8 +133,8 @@ public class playerHealth : MonoBehaviour
         Debug.Log("Jugador muerto");
 
         // Desactivar movimiento
-        playerMovementController movement =
-            GetComponent<playerMovementController>();
+        PlayerMovementController movement =
+            GetComponent<PlayerMovementController>();
 
         if (movement != null)
             movement.enabled = false;
@@ -161,5 +158,12 @@ public class playerHealth : MonoBehaviour
     private void LoadMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
+    }
+
+    public void Heal(int amount = 1)
+    {
+        currentHearts = Mathf.Min(currentHearts + amount, maxHearts);
+
+        OnHealthChanged?.Invoke(currentHearts, maxHearts);
     }
 }

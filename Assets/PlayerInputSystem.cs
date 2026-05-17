@@ -136,6 +136,15 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Interact/Pickup"",
+                    ""type"": ""Value"",
+                    ""id"": ""1b9decf5-54ef-4d17-a8d3-eb1913d403bb"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -215,6 +224,17 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
                     ""action"": ""KeyboardUpgrade"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5f00516d-bcee-4dd4-bf70-9e7114b8e5ae"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interact/Pickup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -228,6 +248,7 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
         m_Player_ThrowSword = m_Player.FindAction("ThrowSword", throwIfNotFound: true);
         m_Player_KeyboardUpgrade = m_Player.FindAction("KeyboardUpgrade", throwIfNotFound: true);
+        m_Player_InteractPickup = m_Player.FindAction("Interact/Pickup", throwIfNotFound: true);
     }
 
     ~@PlayerInputSystem()
@@ -313,6 +334,7 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Attack;
     private readonly InputAction m_Player_ThrowSword;
     private readonly InputAction m_Player_KeyboardUpgrade;
+    private readonly InputAction m_Player_InteractPickup;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -344,6 +366,10 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/KeyboardUpgrade".
         /// </summary>
         public InputAction @KeyboardUpgrade => m_Wrapper.m_Player_KeyboardUpgrade;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/InteractPickup".
+        /// </summary>
+        public InputAction @InteractPickup => m_Wrapper.m_Player_InteractPickup;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -385,6 +411,9 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
             @KeyboardUpgrade.started += instance.OnKeyboardUpgrade;
             @KeyboardUpgrade.performed += instance.OnKeyboardUpgrade;
             @KeyboardUpgrade.canceled += instance.OnKeyboardUpgrade;
+            @InteractPickup.started += instance.OnInteractPickup;
+            @InteractPickup.performed += instance.OnInteractPickup;
+            @InteractPickup.canceled += instance.OnInteractPickup;
         }
 
         /// <summary>
@@ -411,6 +440,9 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
             @KeyboardUpgrade.started -= instance.OnKeyboardUpgrade;
             @KeyboardUpgrade.performed -= instance.OnKeyboardUpgrade;
             @KeyboardUpgrade.canceled -= instance.OnKeyboardUpgrade;
+            @InteractPickup.started -= instance.OnInteractPickup;
+            @InteractPickup.performed -= instance.OnInteractPickup;
+            @InteractPickup.canceled -= instance.OnInteractPickup;
         }
 
         /// <summary>
@@ -486,5 +518,12 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnKeyboardUpgrade(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Interact/Pickup" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnInteractPickup(InputAction.CallbackContext context);
     }
 }

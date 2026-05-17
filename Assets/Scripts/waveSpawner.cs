@@ -1,97 +1,116 @@
 using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class waveSpawner : MonoBehaviour
 {
+    [Header("Player")]
     [SerializeField] private Transform playerPosition;
 
-    [System.Serializable]
-    public class EnemyType
-    {
-        public GameObject prefab;
-        public int count;
-    }
+    [Header("Spawn Points")]
+    [SerializeField] private Transform[] spawnPoints;
 
-    [System.Serializable]
-    public class Wave
-    {
-        public EnemyType[] enemies;
-        public float spawnRate; // enemigos por segundo
-    }
+    [Header("UI")]
+    [SerializeField] private TMP_Text waveText;
 
-    public Wave[] waves;
-    public Transform[] spawnPoints;
+    private WaveData[] waves;
 
     private int currentWaveIndex = 0;
     private int enemiesAlive = 0;
 
-    void Start()
+    private void Start()
     {
-        StartCoroutine(StartWave());
+        DifficultySettings difficulty =
+            GameManager.Instance.currentDifficulty;
+
+        waves = difficulty.waves;
+
+        StartCoroutine(StartWaveRoutine());
     }
 
-    IEnumerator StartWave()
+    IEnumerator StartWaveRoutine()
     {
-        while (currentWaveIndex < waves.Length)
+        DifficultySettings difficulty =
+            GameManager.Instance.currentDifficulty;
+
+        int maxRounds = Mathf.Min(
+            difficulty.numberOfRounds,
+            waves.Length
+        );
+
+        while (currentWaveIndex < maxRounds)
         {
-            Wave wave = waves[currentWaveIndex];
+            waveText.text = "Oleada " + (currentWaveIndex + 1);
 
-            yield return StartCoroutine(SpawnWave(wave));
+            WaveData currentWave = waves[currentWaveIndex];
 
-            // Esperar a que todos mueran
+            Debug.Log("Iniciando Wave " + (currentWaveIndex + 1));
+
+            yield return StartCoroutine(SpawnWave(currentWave));
+
             yield return new WaitUntil(() => enemiesAlive == 0);
 
             currentWaveIndex++;
+
             yield return new WaitForSeconds(2f);
         }
-
-        Debug.Log("¡Todas las oleadas completadas!");
     }
 
-    IEnumerator SpawnWave(Wave wave)
+    IEnumerator SpawnWave(WaveData wave)
     {
-        // Crear lista con todos los enemigos de la oleada
-        List<GameObject> pool = new List<GameObject>();
-
-        foreach (EnemyType enemyType in wave.enemies)
+        for (int i = 0; i < wave.enemyCount; i++)
         {
-            for (int i = 0; i < enemyType.count; i++)
-            {
-                pool.Add(enemyType.prefab);
-            }
-        }
+            GameObject enemyPrefab = GetRandomEnemy(wave);
 
-        // Mezclar enemigos (shuffle)
-        for (int i = 0; i < pool.Count; i++)
-        {
-            GameObject temp = pool[i];
-            int randomIndex = Random.Range(i, pool.Count);
-            pool[i] = pool[randomIndex];
-            pool[randomIndex] = temp;
-        }
+            SpawnEnemy(enemyPrefab);
 
-        // Spawnear
-        foreach (GameObject prefab in pool)
-        {
-            SpawnEnemy(prefab);
             yield return new WaitForSeconds(1f / wave.spawnRate);
         }
     }
 
+    GameObject GetRandomEnemy(WaveData wave)
+    {
+        float totalWeight = 0f;
+
+        foreach (WaveEnemyEntry enemy in wave.enemies)
+        {
+            totalWeight += enemy.spawnWeight;
+        }
+
+        float randomValue = Random.Range(0f, totalWeight);
+
+        float currentWeight = 0f;
+
+        foreach (WaveEnemyEntry enemy in wave.enemies)
+        {
+            currentWeight += enemy.spawnWeight;
+
+            if (randomValue <= currentWeight)
+            {
+                return enemy.enemyData.enemyPrefab;
+            }
+        }
+
+        return wave.enemies[0].enemyData.enemyPrefab;
+    }
+
     void SpawnEnemy(GameObject enemyPrefab)
     {
-        Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
-        GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
+        Transform spawnPoint =
+            spawnPoints[Random.Range(0, spawnPoints.Length)];
+
+        GameObject enemy =
+            Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
 
         enemiesAlive++;
 
-        // Suscribirse al evento de muerte
-        enemyMovement enemyScript = enemy.GetComponent<enemyMovement>();
+        EnemyMovement enemyScript =
+            enemy.GetComponent<EnemyMovement>();
+
         if (enemyScript != null)
         {
-            Debug.Log("Entro al script enemy");
             enemyScript.setTarget(playerPosition);
+
             enemyScript.OnDeath += OnEnemyDeath;
         }
     }

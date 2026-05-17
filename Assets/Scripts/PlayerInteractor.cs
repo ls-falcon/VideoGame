@@ -95,8 +95,9 @@ public class PlayerInteractor : MonoBehaviour
                 popupAnchor.position
             );
 
-        interactPopup.transform.position =
-            screenPosition;
+        RectTransform rectTransform = interactPopup.GetComponent<RectTransform>();
+
+        rectTransform.position = screenPosition;
     }
 
     void OnInteract(InputAction.CallbackContext ctx)

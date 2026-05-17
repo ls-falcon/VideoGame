@@ -127,6 +127,15 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""KeyboardUpgrade"",
+                    ""type"": ""Value"",
+                    ""id"": ""6f9b5912-014d-4866-b449-81db6ad41c9f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -195,6 +204,17 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
                     ""action"": ""ThrowSword"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""378217ff-1086-4909-8000-21bbe55d6b9d"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""KeyboardUpgrade"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -207,6 +227,7 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
         m_Player_ThrowSword = m_Player.FindAction("ThrowSword", throwIfNotFound: true);
+        m_Player_KeyboardUpgrade = m_Player.FindAction("KeyboardUpgrade", throwIfNotFound: true);
     }
 
     ~@PlayerInputSystem()
@@ -291,6 +312,7 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Attack;
     private readonly InputAction m_Player_ThrowSword;
+    private readonly InputAction m_Player_KeyboardUpgrade;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -318,6 +340,10 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/ThrowSword".
         /// </summary>
         public InputAction @ThrowSword => m_Wrapper.m_Player_ThrowSword;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/KeyboardUpgrade".
+        /// </summary>
+        public InputAction @KeyboardUpgrade => m_Wrapper.m_Player_KeyboardUpgrade;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -356,6 +382,9 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
             @ThrowSword.started += instance.OnThrowSword;
             @ThrowSword.performed += instance.OnThrowSword;
             @ThrowSword.canceled += instance.OnThrowSword;
+            @KeyboardUpgrade.started += instance.OnKeyboardUpgrade;
+            @KeyboardUpgrade.performed += instance.OnKeyboardUpgrade;
+            @KeyboardUpgrade.canceled += instance.OnKeyboardUpgrade;
         }
 
         /// <summary>
@@ -379,6 +408,9 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
             @ThrowSword.started -= instance.OnThrowSword;
             @ThrowSword.performed -= instance.OnThrowSword;
             @ThrowSword.canceled -= instance.OnThrowSword;
+            @KeyboardUpgrade.started -= instance.OnKeyboardUpgrade;
+            @KeyboardUpgrade.performed -= instance.OnKeyboardUpgrade;
+            @KeyboardUpgrade.canceled -= instance.OnKeyboardUpgrade;
         }
 
         /// <summary>
@@ -447,5 +479,12 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnThrowSword(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "KeyboardUpgrade" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnKeyboardUpgrade(InputAction.CallbackContext context);
     }
 }

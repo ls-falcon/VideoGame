@@ -14,11 +14,11 @@ public class playerMovementController : MonoBehaviour
     private bool jumpPressed = false;
     private float originalGravity;
 
-    [Header("Configuraci�n de Movimiento")]
+    [Header("ConfiguraciÃ³n de Movimiento")]
     [SerializeField] private float playerSpeed = 4f;
     [SerializeField] private float jumpForce = 6f;
 
-    [Header("Detecci�n de Suelo")]
+    [Header("DetecciÃ³n de Suelo")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundRadius = 0.2f;
     [SerializeField] private LayerMask groundMask;
@@ -37,11 +37,18 @@ public class playerMovementController : MonoBehaviour
     [SerializeField] private ThrownSword sword;
     [SerializeField] private Transform swordHolder;
     [SerializeField] private float pullSpeed = 15f;
-    [SerializeField] private float momentumDecay = 15f; // Qu� tan r�pido pierde el impulso en el aire
+    [SerializeField] private float momentumDecay = 15f; // QuÃ© tan rÃ¡pido pierde el impulso en el aire
+    [SerializeField] private SwordAimUI swordAimUI;
+    [SerializeField] private float minThrowForce = 2f;
+    [SerializeField] private float maxThrowForce = 12f;
+    [SerializeField] private float chargeTimeToMax = 1.2f;
 
     private Vector2 savedVelocity;
     private bool pullingToSword = false;
     private bool hasPullMomentum = false; // <--- NUEVA VARIABLE
+    private bool isAiming = false;
+    private Vector2 aimDirection = Vector2.right;
+    private float aimCharge = 0f;
 
     private void Awake()
     {
@@ -50,7 +57,8 @@ public class playerMovementController : MonoBehaviour
 
         playerInput.Player.Jump.performed += OnJump;
         playerInput.Player.Attack.performed += OnAttack;
-        playerInput.Player.ThrowSword.performed += OnThrowSword;
+        playerInput.Player.ThrowSword.performed += OnThrowSwordPressed;
+        playerInput.Player.ThrowSword.canceled += OnThrowSwordReleased;
 
         // Inicializamos los componentes
         animator = GetComponent<Animator>();
@@ -66,20 +74,21 @@ public class playerMovementController : MonoBehaviour
         sword.SetPlayerCollider(GetComponent<Collider2D>());
 
         originalAttackPointPos = attackPoint.localPosition;
+        SetupSwordAimUI();
     }
 
     private void Update()
     {
         moveX = playerInput.Player.HorizontalMovement.ReadValue<float>();
 
-        // --- L�gica de Animaci�n y Flip ---
+        // --- LÃ³gica de AnimaciÃ³n y Flip ---
 
         // Usamos Mathf.Abs para que si moveX es -1, se convierta en 1.
-        // As� el par�metro "Movs" siempre refleja si hay movimiento.
+        // AsÃ­ el parÃ¡metro "Movs" siempre refleja si hay movimiento.
         float movsValue = Mathf.Abs(moveX);
         animator.SetFloat("Movs", movsValue);
 
-        // Voltear el sprite seg�n la direcci�n
+        // Voltear el sprite segÃºn la direcciÃ³n
         if (moveX > 0)
         {
             spriteRenderer.flipX = false;
@@ -97,6 +106,11 @@ public class playerMovementController : MonoBehaviour
             originalAttackPointPos.y,
             originalAttackPointPos.z
         );
+
+        if (isAiming)
+        {
+            UpdateAim();
+        }
     }
 
     private void FixedUpdate()
@@ -136,7 +150,7 @@ public class playerMovementController : MonoBehaviour
             rb.linearVelocity = new Vector2(moveX * playerSpeed, rb.linearVelocity.y);
         }
 
-        // --- L�GICA DE SALTO ---
+        // --- LÃ“GICA DE SALTO ---
         if (jumpPressed && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
@@ -144,7 +158,7 @@ public class playerMovementController : MonoBehaviour
         }
     }
 
-    void OnThrowSword(InputAction.CallbackContext ctx)
+    void OnThrowSwordPressed(InputAction.CallbackContext ctx)
     {
         if (pullingToSword)
         {
@@ -154,11 +168,19 @@ public class playerMovementController : MonoBehaviour
 
         if (!sword.IsThrown)
         {
-            ThrowSword();
+            StartAiming();
         }
         else
         {
             PullPlayerToSword();
+        }
+    }
+
+    void OnThrowSwordReleased(InputAction.CallbackContext ctx)
+    {
+        if (isAiming)
+        {
+            ThrowSword();
         }
     }
 
@@ -170,7 +192,7 @@ public class playerMovementController : MonoBehaviour
         // Activamos el momentum para que no frene en seco
         hasPullMomentum = true;
 
-        // BORRAMOS O COMENTAMOS ESTA L�NEA:
+        // BORRAMOS O COMENTAMOS ESTA LÃNEA:
         // rb.linearVelocity = savedVelocity; 
     }
 
@@ -181,21 +203,100 @@ public class playerMovementController : MonoBehaviour
         animator.SetBool("NoSword", false);
         sword.AttachToPlayer(swordHolder);
 
-        // OPCIONAL: Si tambi�n quieres que salga disparado con inercia 
-        // al llegar con �xito a la espada, activa esto aqu� tambi�n:
+        // OPCIONAL: Si tambiÃ©n quieres que salga disparado con inercia 
+        // al llegar con Ã©xito a la espada, activa esto aquÃ­ tambiÃ©n:
         hasPullMomentum = true;
     }
 
     void ThrowSword()
     {
+        float force = Mathf.Lerp(minThrowForce, maxThrowForce, aimCharge);
 
-
-        Vector2 direction = spriteRenderer.flipX
-            ? Vector2.left
-            : Vector2.right;
-
-        sword.Throw(direction);
+        sword.Throw(aimDirection, force);
         animator.SetBool("NoSword", true);
+        isAiming = false;
+
+        if (swordAimUI != null)
+        {
+            swordAimUI.Show(false);
+        }
+    }
+
+    void StartAiming()
+    {
+        isAiming = true;
+        aimCharge = 0f;
+        aimDirection = spriteRenderer.flipX ? Vector2.left : Vector2.right;
+
+        if (swordAimUI != null)
+        {
+            swordAimUI.Show(true);
+        }
+
+        UpdateAim();
+    }
+
+    void UpdateAim()
+    {
+        aimCharge = Mathf.Min(
+            aimCharge + Time.deltaTime / Mathf.Max(chargeTimeToMax, 0.01f),
+            1f
+        );
+
+        Vector2 startPosition = swordHolder.position;
+        Vector2 targetPosition = GetMouseWorldPosition();
+        Vector2 direction = targetPosition - startPosition;
+
+        // Evita direcciones vacÃ­as si el cursor estÃ¡ justo encima del jugador.
+        if (direction.sqrMagnitude > 0.01f)
+        {
+            aimDirection = direction.normalized;
+        }
+
+        if (swordAimUI != null)
+        {
+            float force = Mathf.Lerp(minThrowForce, maxThrowForce, aimCharge);
+
+            swordAimUI.UpdateAim(
+                startPosition,
+                targetPosition,
+                force,
+                sword.GravityScale,
+                aimCharge
+            );
+        }
+    }
+
+    Vector2 GetMouseWorldPosition()
+    {
+        if (Camera.main == null || Mouse.current == null)
+        {
+            return (Vector2)swordHolder.position + aimDirection;
+        }
+
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        return new Vector2(mouseWorld.x, mouseWorld.y);
+    }
+
+    void SetupSwordAimUI()
+    {
+        if (swordAimUI == null)
+        {
+            Transform aimIndicator = transform.Find("AimIndicator");
+            if (aimIndicator != null)
+            {
+                swordAimUI = aimIndicator.GetComponent<SwordAimUI>();
+                if (swordAimUI == null)
+                {
+                    swordAimUI = aimIndicator.gameObject.AddComponent<SwordAimUI>();
+                }
+            }
+        }
+
+        if (swordAimUI != null)
+        {
+            swordAimUI.Show(false);
+        }
     }
 
     void PullPlayerToSword()

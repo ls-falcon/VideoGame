@@ -68,6 +68,11 @@ public class SwordAimUI : MonoBehaviour
         Show(false);
     }
 
+    private void OnDisable()
+    {
+        Cursor.visible = previousCursorVisible;
+    }
+
     public void Show(bool visible)
     {
         SetupReferences();
@@ -82,12 +87,12 @@ public class SwordAimUI : MonoBehaviour
             Cursor.visible = previousCursorVisible;
         }
 
-        gameObject.SetActive(visible);
-
         if (!visible)
         {
             SetCharge(0f);
         }
+
+        gameObject.SetActive(visible);
     }
 
     public void UpdateAim(Vector2 startPosition, Vector2 targetPosition, float throwForce, float gravityScale, float charge)

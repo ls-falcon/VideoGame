@@ -65,6 +65,20 @@ public class playerMovementController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
+    private void OnDestroy()
+    {
+        if (playerInput == null) return;
+
+        playerInput.Player.Jump.performed -= OnJump;
+        playerInput.Player.Attack.performed -= OnAttack;
+        playerInput.Player.ThrowSword.performed -= OnThrowSwordPressed;
+        playerInput.Player.ThrowSword.canceled -= OnThrowSwordReleased;
+
+        playerInput.Player.Disable();
+        playerInput.Dispose();
+        playerInput = null;
+    }
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -178,7 +192,7 @@ public class playerMovementController : MonoBehaviour
 
     void OnThrowSwordReleased(InputAction.CallbackContext ctx)
     {
-        if (isAiming)
+        if (isAiming && sword != null)
         {
             ThrowSword();
         }
@@ -210,6 +224,16 @@ public class playerMovementController : MonoBehaviour
 
     void ThrowSword()
     {
+        if (sword == null)
+        {
+            isAiming = false;
+            if (swordAimUI != null)
+            {
+                swordAimUI.Show(false);
+            }
+            return;
+        }
+
         float force = Mathf.Lerp(minThrowForce, maxThrowForce, aimCharge);
 
         sword.Throw(aimDirection, force);

@@ -233,7 +233,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   attackPoint: {fileID: 360566236}
-  attackRadius: 0.3
+  attackRadius: 1
   enemyLayer:
     serializedVersion: 2
     m_Bits: 512
@@ -423,6 +423,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::playerHealth
   maxHearts: 2
   currentHearts: 0
+  invulnerabilityTime: 0.7
   gameOverPanel: {fileID: 981473997}
 --- !u!1 &152423849
 GameObject:

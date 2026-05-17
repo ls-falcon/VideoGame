@@ -14,11 +14,11 @@ public class playerMovementController : MonoBehaviour
     private bool jumpPressed = false;
     private float originalGravity;
 
-    [Header("ConfiguraciÃ³n de Movimiento")]
+    [Header("Configuraci�n de Movimiento")]
     [SerializeField] private float playerSpeed = 4f;
     [SerializeField] private float jumpForce = 6f;
 
-    [Header("DetecciÃ³n de Suelo")]
+    [Header("Detecci�n de Suelo")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundRadius = 0.2f;
     [SerializeField] private LayerMask groundMask;
@@ -81,14 +81,14 @@ public class playerMovementController : MonoBehaviour
     {
         moveX = playerInput.Player.HorizontalMovement.ReadValue<float>();
 
-        // --- LÃ³gica de AnimaciÃ³n y Flip ---
+        // --- L�gica de Animaci�n y Flip ---
 
         // Usamos Mathf.Abs para que si moveX es -1, se convierta en 1.
-        // AsÃ­ el parÃ¡metro "Movs" siempre refleja si hay movimiento.
+        // As� el par�metro "Movs" siempre refleja si hay movimiento.
         float movsValue = Mathf.Abs(moveX);
         animator.SetFloat("Movs", movsValue);
 
-        // Voltear el sprite segÃºn la direcciÃ³n
+        // Voltear el sprite seg�n la direcci�n
         if (moveX > 0)
         {
             spriteRenderer.flipX = false;
@@ -150,7 +150,7 @@ public class playerMovementController : MonoBehaviour
             rb.linearVelocity = new Vector2(moveX * playerSpeed, rb.linearVelocity.y);
         }
 
-        // --- LÃ“GICA DE SALTO ---
+        // --- L�GICA DE SALTO ---
         if (jumpPressed && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
@@ -192,7 +192,7 @@ public class playerMovementController : MonoBehaviour
         // Activamos el momentum para que no frene en seco
         hasPullMomentum = true;
 
-        // BORRAMOS O COMENTAMOS ESTA LÃNEA:
+        // BORRAMOS O COMENTAMOS ESTA L�NEA:
         // rb.linearVelocity = savedVelocity; 
     }
 
@@ -203,8 +203,8 @@ public class playerMovementController : MonoBehaviour
         animator.SetBool("NoSword", false);
         sword.AttachToPlayer(swordHolder);
 
-        // OPCIONAL: Si tambiÃ©n quieres que salga disparado con inercia 
-        // al llegar con Ã©xito a la espada, activa esto aquÃ­ tambiÃ©n:
+        // OPCIONAL: Si tambi�n quieres que salga disparado con inercia 
+        // al llegar con �xito a la espada, activa esto aqu� tambi�n:
         hasPullMomentum = true;
     }
 

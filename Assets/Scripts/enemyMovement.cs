@@ -5,7 +5,7 @@ public class enemyMovement : MonoBehaviour
     [SerializeField] private Transform playerPosition;
     [SerializeField] private float enemySpeed = 2f;
     [SerializeField] private float stoppingDistance = 0.1f; // Distancia m nima para detenerse
-    // Código agregado para daño a personaje
+    // Cï¿½digo agregado para daï¿½o a personaje
     [SerializeField] private int damage = 1;
     [SerializeField] private float damageCooldown = 1f;
     private float lastDamageTime;
@@ -57,7 +57,7 @@ public class enemyMovement : MonoBehaviour
     {
         playerPosition = target;
     }
-    //CODIGO AGREGADO PARA DAÑO A PERSONAJE
+    //CODIGO AGREGADO PARA DAï¿½O A PERSONAJE
     private void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
@@ -68,7 +68,7 @@ public class enemyMovement : MonoBehaviour
                     collision.gameObject.GetComponent<playerHealth>();
                 if (playerHealth != null)
                 {
-                    playerHealth.TakeDamage(damage);
+                    playerHealth.TakeDamage(damage, transform.position);
                     lastDamageTime = Time.time;
                 }
             }

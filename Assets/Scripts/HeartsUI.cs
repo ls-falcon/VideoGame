@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class HeartsUI : MonoBehaviour
 {
-    [SerializeField] private playerHealth health;
+    [SerializeField] private PlayerHealth health;
     [SerializeField] private Image heartPrefab;
     [SerializeField] private Sprite fullHeartSprite;
     [SerializeField] private Sprite emptyHeartSprite;
@@ -13,7 +13,7 @@ public class HeartsUI : MonoBehaviour
 
     private void Start()
     {
-        int maxHearts = gameManager.Instance.currentDifficulty.maxInitialHearts;
+        int maxHearts = GameManager.Instance.currentDifficulty.maxInitialHearts;
 
         heartImages = new Image[maxHearts];
 

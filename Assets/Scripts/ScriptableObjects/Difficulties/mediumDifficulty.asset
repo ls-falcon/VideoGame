@@ -13,4 +13,8 @@ MonoBehaviour:
   m_Name: mediumDifficulty
   m_EditorClassIdentifier: Assembly-CSharp::DifficultySettings
   maxInitialHearts: 8
-  numberOfRounds: 10
+  numberOfRounds: 3
+  waves:
+  - {fileID: 11400000, guid: 093dd8987ceab9641b7ae7a5159c9b03, type: 2}
+  - {fileID: 11400000, guid: 7e948d6e7e49faa4d8330c9135a3baba, type: 2}
+  - {fileID: 11400000, guid: 5eb6a689d0ff0544094a3dde4d18a5a0, type: 2}

@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class gameManager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
-    public static gameManager Instance;
+    public static GameManager Instance;
 
     public DifficultySettings currentDifficulty {  get; private set; }
 

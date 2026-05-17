@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-public class enemyMovement : MonoBehaviour
+public class EnemyMovement : MonoBehaviour
 {
     [SerializeField] private Transform playerPosition;
     [SerializeField] private float enemySpeed = 2f;
@@ -64,8 +64,8 @@ public class enemyMovement : MonoBehaviour
         {
             if (Time.time >= lastDamageTime + damageCooldown)
             {
-                playerHealth playerHealth =
-                    collision.gameObject.GetComponent<playerHealth>();
+                PlayerHealth playerHealth =
+                    collision.gameObject.GetComponent<PlayerHealth>();
                 if (playerHealth != null)
                 {
                     playerHealth.TakeDamage(damage, transform.position);

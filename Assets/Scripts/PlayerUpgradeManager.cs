@@ -5,8 +5,8 @@ using UnityEngine.InputSystem;
 public class PlayerUpgradeManager : MonoBehaviour
 {
     [Header("Referencias")]
-    [SerializeField] private playerHealth playerHealth;
-    [SerializeField] private playerMovementController movement;
+    [SerializeField] private PlayerHealth playerHealth;
+    [SerializeField] private PlayerMovementController movement;
     [SerializeField] private UpgradeBannerUI bannerUI;
 
 

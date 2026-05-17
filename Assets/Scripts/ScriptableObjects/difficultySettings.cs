@@ -11,4 +11,7 @@ public class DifficultySettings : ScriptableObject
 
     [Header("Game")]
     public int numberOfRounds;
+
+    [Header("Waves")]
+    public WaveData[] waves;
 }

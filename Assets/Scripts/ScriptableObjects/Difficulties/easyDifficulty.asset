@@ -13,4 +13,6 @@ MonoBehaviour:
   m_Name: easyDifficulty
   m_EditorClassIdentifier: Assembly-CSharp::DifficultySettings
   maxInitialHearts: 10
-  numberOfRounds: 5
+  numberOfRounds: 1
+  waves:
+  - {fileID: 11400000, guid: 093dd8987ceab9641b7ae7a5159c9b03, type: 2}

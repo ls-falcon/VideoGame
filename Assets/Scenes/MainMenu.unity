@@ -804,8 +804,8 @@ MonoBehaviour:
   easyDifficulty: {fileID: 11400000, guid: 1f67987a7fc9d0a439ee821736430bfc, type: 2}
   mediumDifficulty: {fileID: 11400000, guid: cc227319b4d7d5440a38543eab670e4b, type: 2}
   hardDifficulty: {fileID: 11400000, guid: d5b798e9177479048aa8149568e3ff27, type: 2}
-  MainMenu: {fileID: 167039973}
-  DifficultyMenu: {fileID: 1834072731}
+  mainMenu: {fileID: 167039973}
+  difficultyMenu: {fileID: 1834072731}
 --- !u!1 &586608572
 GameObject:
   m_ObjectHideFlags: 0
@@ -1524,7 +1524,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: GAME
+  m_text: A GAME
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

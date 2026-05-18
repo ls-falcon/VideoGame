@@ -12,9 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b01d2e6b7e02c2c44865f56a771eb006, type: 3}
   m_Name: mediumDifficulty
   m_EditorClassIdentifier: Assembly-CSharp::DifficultySettings
-  maxInitialHearts: 8
-  numberOfRounds: 3
+  maxInitialHearts: 5
+  numberOfRounds: 8
   waves:
   - {fileID: 11400000, guid: 093dd8987ceab9641b7ae7a5159c9b03, type: 2}
   - {fileID: 11400000, guid: 7e948d6e7e49faa4d8330c9135a3baba, type: 2}
   - {fileID: 11400000, guid: 5eb6a689d0ff0544094a3dde4d18a5a0, type: 2}
+  - {fileID: 11400000, guid: cedd3c8f45589a6458b50ca30321ca38, type: 2}
+  - {fileID: 11400000, guid: 65a9d18170628194bb0dc7b722d0de67, type: 2}
+  - {fileID: 11400000, guid: 77bc36dd32a69ab4b826f4c996ba4d67, type: 2}
+  - {fileID: 11400000, guid: bda96a2fc871f0246872745255c6a801, type: 2}
+  - {fileID: 11400000, guid: affeef01efd9f7e4d9995a9adc5a5064, type: 2}

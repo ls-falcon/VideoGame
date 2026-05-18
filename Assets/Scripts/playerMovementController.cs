@@ -3,6 +3,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovementController : MonoBehaviour
 {
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip swordSound;
+
     private PlayerInputSystem playerInput;
     private Rigidbody2D rb;
 
@@ -411,6 +414,8 @@ public class PlayerMovementController : MonoBehaviour
         animator.speed = MeleeAttackSpeedMultiplier;
 
         animator.SetTrigger("Attack");
+
+        audioSource.PlayOneShot(swordSound);
     }
 
     public void EndAttack()

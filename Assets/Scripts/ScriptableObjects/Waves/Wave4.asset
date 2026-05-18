@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5e2f5b1ec9120474396f9619ba954bec, type: 3}
-  m_Name: Wave1
+  m_Name: Wave4
   m_EditorClassIdentifier: Assembly-CSharp::WaveData
-  enemyCount: 4
-  spawnRate: 0.8
+  enemyCount: 10
+  spawnRate: 1.5
   enemies:
   - enemyData: {fileID: 11400000, guid: f3ce0333063cbcb408965a136028919e, type: 2}
-    spawnWeight: 0.88
+    spawnWeight: 0.6
   - enemyData: {fileID: 11400000, guid: d7a5dee1257db544789c187313b6bdd7, type: 2}
-    spawnWeight: 0.2
+    spawnWeight: 0.4

@@ -5,6 +5,10 @@ using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip damageSound;
+    [SerializeField] private AudioClip pickupSound;
+
     [SerializeField] private int maxHearts;
     [SerializeField] private int currentHearts;
 
@@ -55,6 +59,8 @@ public class PlayerHealth : MonoBehaviour
         {
             Die();
         }
+
+        audioSource.PlayOneShot(damageSound);
     }
 
     private void ApplyKnockback(Vector2 damageSource)
@@ -165,5 +171,7 @@ public class PlayerHealth : MonoBehaviour
         currentHearts = Mathf.Min(currentHearts + amount, maxHearts);
 
         OnHealthChanged?.Invoke(currentHearts, maxHearts);
+
+        audioSource.PlayOneShot(pickupSound);
     }
 }

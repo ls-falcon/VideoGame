@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class waveSpawner : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class waveSpawner : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private TMP_Text waveText;
+
+    [Header("UI")]
+    [SerializeField] private TMP_Text waveBannerText;
 
     private WaveData[] waves;
 
@@ -38,8 +42,26 @@ public class waveSpawner : MonoBehaviour
             waves.Length
         );
 
+
         while (currentWaveIndex < maxRounds)
         {
+            waveText.gameObject.SetActive(false);
+
+            //COLOCAR BANNER GRANDE SOBRE QUE RONDA ESTAMOS
+            waveBannerText.gameObject.SetActive(true);
+
+            waveBannerText.text =
+                "===== OLEADA " + (currentWaveIndex + 1) + " =====";
+
+            yield return new WaitForSeconds(2f);
+
+            waveBannerText.gameObject.SetActive(false);
+
+            waveText.gameObject.SetActive(true);
+
+            waveText.text =
+                "Oleada " + (currentWaveIndex + 1);
+
             waveText.text = "Oleada " + (currentWaveIndex + 1);
 
             WaveData currentWave = waves[currentWaveIndex];
@@ -52,8 +74,18 @@ public class waveSpawner : MonoBehaviour
 
             currentWaveIndex++;
 
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(4f);
         }
+
+        waveText.gameObject.SetActive(false);
+        waveBannerText.gameObject.SetActive(true);
+
+        waveBannerText.text = "¡VICTORIA!";
+        waveBannerText.color = Color.green;
+
+        yield return new WaitForSeconds(3f);
+
+        SceneManager.LoadScene("MainMenu");
     }
 
     IEnumerator SpawnWave(WaveData wave)

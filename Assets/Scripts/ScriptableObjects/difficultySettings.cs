@@ -6,6 +6,8 @@ using UnityEngine;
 )]
 public class DifficultySettings : ScriptableObject
 {
+    public string difficultyName;
+
     [Header("Player")]
     public int maxInitialHearts;
 

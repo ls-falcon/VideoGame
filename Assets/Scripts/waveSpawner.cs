@@ -1,5 +1,6 @@
 using System.Collections;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,6 +17,16 @@ public class waveSpawner : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private TMP_Text waveBannerText;
+
+    [Header("Boss")]
+    [SerializeField] private GameObject bossPrefab;
+    [SerializeField] private Transform bossSpawnPoint;
+    private bool bossAlive = false;
+
+    [Header("Music")]
+    [SerializeField] private AudioSource musicSource;
+    [SerializeField] private AudioClip bossMusic;
+    [SerializeField] private AudioClip victoryMusic;
 
     private WaveData[] waves;
 
@@ -77,13 +88,29 @@ public class waveSpawner : MonoBehaviour
             yield return new WaitForSeconds(4f);
         }
 
+        //FINAL BOSS
+
+        yield return StartCoroutine(SpawnBoss());
+
+        yield return new WaitUntil(() => bossAlive == false);
+
+        //PANTALLA VICTORIA
+
+        // Cambiar música
+        if (musicSource != null)
+        {
+            musicSource.Stop();
+            musicSource.clip = victoryMusic;
+            musicSource.Play();
+        }
+
         waveText.gameObject.SetActive(false);
         waveBannerText.gameObject.SetActive(true);
 
         waveBannerText.text = "¡VICTORIA!";
         waveBannerText.color = Color.green;
 
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(victoryMusic.length);
 
         SceneManager.LoadScene("MainMenu");
     }
@@ -136,19 +163,75 @@ public class waveSpawner : MonoBehaviour
 
         enemiesAlive++;
 
-        EnemyMovement enemyScript =
+        EnemyMovement enemyMovement =
             enemy.GetComponent<EnemyMovement>();
+        EnemyHealth enemyHealth =
+            enemy.GetComponent<EnemyHealth>();
 
-        if (enemyScript != null)
+        if (enemyMovement != null)
         {
-            enemyScript.setTarget(playerPosition);
-
-            enemyScript.OnDeath += OnEnemyDeath;
+            enemyMovement.setTarget(playerPosition);
+        }
+        if (enemyHealth != null)
+        {
+            enemyHealth.OnDeath += OnEnemyDeath;
         }
     }
 
     void OnEnemyDeath()
     {
         enemiesAlive--;
+    }
+
+    private void OnBossDeath()
+    {
+        bossAlive = false;
+    }
+
+    private IEnumerator SpawnBoss()
+    {
+        waveText.gameObject.SetActive(false);
+
+        waveBannerText.gameObject.SetActive(true);
+        waveBannerText.color = Color.red;
+        waveBannerText.text = "FINAL BOSS";
+
+        // Cambiar música
+        if(musicSource != null)
+        {
+            musicSource.Stop();
+            musicSource.clip = bossMusic;
+            musicSource.Play();
+        }
+
+        GameObject boss = Instantiate(
+            bossPrefab,
+            bossSpawnPoint.position,
+            Quaternion.identity
+        );
+
+        BossMovement bossMovement = boss.GetComponent<BossMovement>();
+        if (bossMovement != null)
+        {
+            bossMovement.SetTarget(playerPosition);
+        }
+
+        BossAttack bossAttack = boss.GetComponent<BossAttack>();
+        if (bossAttack != null)
+        {
+            bossAttack.SetTarget(playerPosition);
+        }
+
+        BossHealth bossHealth = boss.GetComponent<BossHealth>();
+        if (bossHealth != null)
+        {
+            bossAlive = true;
+            bossHealth.OnDeath += OnBossDeath;
+        }
+
+        // Mostrar el banner durante 4 segundos
+        yield return new WaitForSeconds(4f);
+
+        waveBannerText.gameObject.SetActive(false);
     }
 }

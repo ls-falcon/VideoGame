@@ -30,6 +30,7 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] private Transform attackPoint;
     [SerializeField] private float attackRadius = 0.5f;
     [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private LayerMask bossLayer;
     private Vector3 originalAttackPointPos;
     private bool isAttacking = false;
 
@@ -395,12 +396,28 @@ public class PlayerMovementController : MonoBehaviour
             enemyLayer
         );
 
+        Collider2D hitBoss = Physics2D.OverlapCircle(
+            attackPoint.position,
+            attackRadius,
+            bossLayer
+        );
+
         foreach (Collider2D enemyCollider in hitEnemies)
         {
-            EnemyMovement enemy = enemyCollider.GetComponent<EnemyMovement>();
+            EnemyHealth enemy = enemyCollider.GetComponent<EnemyHealth>();
+
             if (enemy != null)
             {
-                enemy.Die();
+                enemy.TakeDamage(1);
+            }
+        }
+
+        if (hitBoss != null)
+        {
+            BossHealth boss = hitBoss.GetComponent<BossHealth>();
+            if (boss != null)
+            {
+                boss.TakeDamage(1);
             }
         }
     }

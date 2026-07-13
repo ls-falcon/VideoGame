@@ -13,7 +13,19 @@ public class HeartsUI : MonoBehaviour
 
     private void Start()
     {
-        int maxHearts = GameManager.Instance.currentDifficulty.maxInitialHearts;
+        if (health == null)
+        {
+            health = FindAnyObjectByType<PlayerHealth>();
+        }
+
+        if (health == null || heartPrefab == null || heartsContainer == null)
+        {
+            Debug.LogError("HeartsUI is missing required references.", this);
+            enabled = false;
+            return;
+        }
+
+        int maxHearts = GetMaxHearts();
 
         heartImages = new Image[maxHearts];
 
@@ -25,6 +37,7 @@ public class HeartsUI : MonoBehaviour
         }
 
         health.OnHealthChanged += UpdateHearts;
+        UpdateHearts(health.CurrentHearts, maxHearts);
     }
 
     private void OnDestroy()
@@ -39,5 +52,22 @@ public class HeartsUI : MonoBehaviour
         {
             heartImages[i].sprite = i < currentHearts ? fullHeartSprite : emptyHeartSprite;
         }
+    }
+
+    private int GetMaxHearts()
+    {
+        if (GameManager.Instance != null &&
+            GameManager.Instance.currentDifficulty != null)
+        {
+            return GameManager.Instance.currentDifficulty.maxInitialHearts;
+        }
+
+        Debug.LogWarning(
+            "No difficulty was selected before loading the game scene. " +
+            "Using PlayerHealth maxHearts as a fallback.",
+            this
+        );
+
+        return Mathf.Max(1, health.MaxHearts);
     }
 }

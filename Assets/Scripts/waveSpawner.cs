@@ -7,6 +7,13 @@ using UnityEngine.UI;
 
 public class waveSpawner : MonoBehaviour
 {
+    private enum BossPlatformBehavior
+    {
+        Keep,
+        Hide,
+        Destroy
+    }
+
     [Header("Player")]
     [SerializeField] private Transform playerPosition;
 
@@ -22,6 +29,8 @@ public class waveSpawner : MonoBehaviour
     [Header("Boss")]
     [SerializeField] private GameObject bossPrefab;
     [SerializeField] private Transform bossSpawnPoint;
+    [SerializeField] private BossPlatformBehavior bossPlatformBehavior =
+        BossPlatformBehavior.Hide;
     private bool bossAlive = false;
 
     [Header("Music")]
@@ -207,6 +216,8 @@ public class waveSpawner : MonoBehaviour
 
     private IEnumerator SpawnBoss()
     {
+        ApplyBossPlatformBehavior();
+
         waveText.gameObject.SetActive(false);
 
         waveBannerText.gameObject.SetActive(true);
@@ -466,6 +477,20 @@ public class waveSpawner : MonoBehaviour
                 // Desplazar un poco a la derecha para cubrir el hueco azul de la derecha
                 sr.transform.position += new Vector3(2.5f, 0f, 0f);
             }
+        }
+    }
+
+    private void ApplyBossPlatformBehavior()
+    {
+        switch (bossPlatformBehavior)
+        {
+            case BossPlatformBehavior.Hide:
+                BreakablePlatform.HideAllPlatforms();
+                break;
+
+            case BossPlatformBehavior.Destroy:
+                BreakablePlatform.DestroyAllPlatforms();
+                break;
         }
     }
 }

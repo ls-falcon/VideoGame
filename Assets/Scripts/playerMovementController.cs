@@ -112,6 +112,7 @@ public class PlayerMovementController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         rb.freezeRotation = true;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
         originalGravity = rb.gravityScale;
         sword.SetPlayerCollider(GetComponent<Collider2D>());

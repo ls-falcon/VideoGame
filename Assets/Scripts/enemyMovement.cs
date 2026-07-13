@@ -4,8 +4,8 @@ public class EnemyMovement : MonoBehaviour
 {
     [SerializeField] private Transform playerPosition;
     [SerializeField] private float enemySpeed = 2f;
-    [SerializeField] private float stoppingDistance = 0.1f; // Distancia m nima para detenerse
-    // Cdigo agregado para dao a personaje
+    [SerializeField] private float stoppingDistance = 0.1f; // Distancia mínima para detenerse
+    [SerializeField] private bool followTargetHeight = false;
     [SerializeField] private int damage = 1;
     [SerializeField] private float damageCooldown = 1f;
     private float lastDamageTime;
@@ -50,9 +50,14 @@ public class EnemyMovement : MonoBehaviour
 
     void Update()
     {
-        if (playerPosition == null) return; // Seguridad por si el jugador no est  asignado
+        if (playerPosition == null) return; // Seguridad por si el jugador no está asignado
 
-        Vector3 targetPos = playerPosition.position;
+        // Establecer base de objetivo dinámico considerando followTargetHeight
+        Vector2 baseTarget = followTargetHeight
+            ? (Vector2)playerPosition.position
+            : new Vector2(playerPosition.position.x, transform.position.y);
+
+        Vector3 targetPos = baseTarget;
 
         // Lógica de descenso ordenada: si el jugador está abajo y el enemigo está arriba de la plataforma más baja
         if (lowestPlatformTransform != null && !reachedLowestPlatform && playerPosition.position.y < transform.position.y)
@@ -73,16 +78,16 @@ public class EnemyMovement : MonoBehaviour
         {
             // --- MOVIMIENTO ---
             transform.position = Vector2.MoveTowards(transform.position, targetPos, enemySpeed * Time.deltaTime);
-            // --- ANIMACI N ---
-            // Si se est  moviendo, ponemos Movs en 1 (o podr as usar enemySpeed)
+            // --- ANIMACIÓN ---
+            // Si se está moviendo, ponemos Movs en 1
             animator.SetFloat("Movs", 1f);
             // --- GIRO (FLIP) ---
-            // Si la X del objetivo es mayor que la del enemigo, el objetivo est  a la derecha
+            // Si la X del objetivo es mayor que la del enemigo, el objetivo está a la derecha
             if (targetPos.x > transform.position.x)
             {
                 spriteRenderer.flipX = false; // Mira a la derecha (default)
             }
-            // Si la X del objetivo es menor, el objetivo est  a la izquierda
+            // Si la X del objetivo es menor, el objetivo está a la izquierda
             else if (targetPos.x < transform.position.x)
             {
                 spriteRenderer.flipX = true; // Mira a la izquierda
@@ -90,14 +95,16 @@ public class EnemyMovement : MonoBehaviour
         }
         else
         {
-            // Si lleg  al objetivo, ponemos Movs en 0 para que pase a Idle
+            // Si llegó al objetivo, ponemos Movs en 0 para que pase a Idle
             animator.SetFloat("Movs", 0f);
         }
     }
+
     public void setTarget(Transform target)
     {
         playerPosition = target;
     }
+
     //CODIGO AGREGADO PARA DAO A PERSONAJE
     private void OnCollisionStay2D(Collision2D collision)
     {

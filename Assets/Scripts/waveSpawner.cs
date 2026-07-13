@@ -36,6 +36,9 @@ public class waveSpawner : MonoBehaviour
 
     private void Start()
     {
+        // Estirar el fondo y configurar color de cámara para eliminar el azul
+        ExpandBackgroundAndSetCameraColor();
+
         // Instanciar el gestor de plataformas dinámicas automáticamente
         if (FindAnyObjectByType<DynamicPlatformManager>() == null)
         {
@@ -437,5 +440,32 @@ public class waveSpawner : MonoBehaviour
             Time.timeScale = 1f;
             Destroy(panelObj);
         });
+    }
+
+    private void ExpandBackgroundAndSetCameraColor()
+    {
+        // 1. Cambiar el color de fondo de la cámara a un tono de bosque oscuro medieval
+        if (Camera.main != null)
+        {
+            Camera.main.backgroundColor = new Color(0.04f, 0.05f, 0.07f);
+            Camera.main.clearFlags = CameraClearFlags.SolidColor;
+        }
+
+        // 2. Buscar y ampliar horizontalmente los fondos
+        SpriteRenderer[] allSprites = FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None);
+        foreach (SpriteRenderer sr in allSprites)
+        {
+            if (sr.gameObject.name.ToLower().Contains("background") || 
+                sr.gameObject.name.ToLower().Contains("fondo") || 
+                (sr.sprite != null && sr.sprite.name.ToLower().Contains("background")))
+            {
+                // Incrementar escala en X para estirar el fondo
+                Vector3 localScale = sr.transform.localScale;
+                sr.transform.localScale = new Vector3(localScale.x * 1.6f, localScale.y, localScale.z);
+                
+                // Desplazar un poco a la derecha para cubrir el hueco azul de la derecha
+                sr.transform.position += new Vector3(2.5f, 0f, 0f);
+            }
+        }
     }
 }

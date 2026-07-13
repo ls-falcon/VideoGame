@@ -1,9 +1,12 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [DisallowMultipleComponent]
 public class BreakablePlatform : MonoBehaviour
 {
+    private static readonly List<BreakablePlatform> ActivePlatforms = new();
+
     [Header("Timing")]
     [SerializeField] private float timeUntilWarning = 2f;
     [SerializeField] private float timeUntilBreak = 3f;
@@ -40,6 +43,40 @@ public class BreakablePlatform : MonoBehaviour
     private float originalAudioSourceVolume = 1f;
     private bool warningSoundPlaying;
     private PlayerMovementController standingPlayer;
+
+    public static void HideAllPlatforms()
+    {
+        BreakablePlatform[] platforms = ActivePlatforms.ToArray();
+
+        foreach (BreakablePlatform platform in platforms)
+        {
+            if (platform == null)
+            {
+                continue;
+            }
+
+            platform.StopWarningSound();
+            platform.StopAllCoroutines();
+            platform.gameObject.SetActive(false);
+        }
+    }
+
+    public static void DestroyAllPlatforms()
+    {
+        BreakablePlatform[] platforms = ActivePlatforms.ToArray();
+
+        foreach (BreakablePlatform platform in platforms)
+        {
+            if (platform == null)
+            {
+                continue;
+            }
+
+            platform.StopWarningSound();
+            platform.StopAllCoroutines();
+            Destroy(platform.gameObject);
+        }
+    }
 
     private void Awake()
     {
@@ -84,6 +121,20 @@ public class BreakablePlatform : MonoBehaviour
         {
             timeUntilWarning = timeUntilBreak;
         }
+    }
+
+    private void OnEnable()
+    {
+        if (!ActivePlatforms.Contains(this))
+        {
+            ActivePlatforms.Add(this);
+        }
+    }
+
+    private void OnDisable()
+    {
+        StopWarningSound();
+        ActivePlatforms.Remove(this);
     }
 
     private void Update()

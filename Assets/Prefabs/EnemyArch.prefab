@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 5488650778105346677}
   - component: {fileID: 1874051464757958314}
   - component: {fileID: 7981450431582799680}
+  - component: {fileID: 3444025605423442128}
   m_Layer: 9
   m_Name: EnemyArch
   m_TagString: Enemy
@@ -34,7 +35,8 @@ Transform:
   m_LocalPosition: {x: 6.26, y: -3.252, z: 0}
   m_LocalScale: {x: 0.8254309, y: 0.8254309, z: 0.8254309}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 4404159486231951017}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &956794964516915049
@@ -211,3 +213,53 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66adc7f9c22a40746b29adbb3a087a34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::enemyHealth
+  maxHealth: 1
+--- !u!114 &3444025605423442128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4526626841287281678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6b65c49d4ea4b046b81c6835dae1b41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyArcher
+  arrowPrefab: {fileID: 4919682001236196959, guid: 5c8feaecf29338441ae4c579f0d4dd82, type: 3}
+  firePoint: {fileID: 4404159486231951017}
+  attackRange: 6
+  fireRate: 2
+  accuracy: 50
+  missOffset: 2.5
+--- !u!1 &6953046474844930413
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4404159486231951017}
+  m_Layer: 9
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4404159486231951017
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6953046474844930413}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.358, y: -0.139, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2118890700972969918}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

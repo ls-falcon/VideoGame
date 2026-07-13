@@ -4,6 +4,7 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] private Transform playerPosition;
     [SerializeField] private float enemySpeed = 2f;
     [SerializeField] private float stoppingDistance = 0.1f; // Distancia m nima para detenerse
+    [SerializeField] private bool followTargetHeight = false;
     // C�digo agregado para da�o a personaje
     [SerializeField] private int damage = 1;
     [SerializeField] private float damageCooldown = 1f;
@@ -19,12 +20,16 @@ public class EnemyMovement : MonoBehaviour
     void Update()
     {
         if (playerPosition == null) return; // Seguridad por si el jugador no est  asignado
+        Vector2 targetPosition = followTargetHeight
+            ? playerPosition.position
+            : new Vector2(playerPosition.position.x, transform.position.y);
+
         // Calculamos la distancia entre el enemigo y el jugador
-        float distanceToPlayer = Vector2.Distance(transform.position, playerPosition.position);
+        float distanceToPlayer = Vector2.Distance(transform.position, targetPosition);
         if (distanceToPlayer > stoppingDistance)
         {
             // --- MOVIMIENTO ---
-            transform.position = Vector2.MoveTowards(transform.position, playerPosition.position, enemySpeed * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(transform.position, targetPosition, enemySpeed * Time.deltaTime);
             // --- ANIMACI N ---
             // Si se est  moviendo, ponemos Movs en 1 (o podr as usar enemySpeed)
             animator.SetFloat("Movs", 1f);

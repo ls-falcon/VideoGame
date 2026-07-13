@@ -16,6 +16,7 @@ public class PlayerHealth : MonoBehaviour
     private Rigidbody2D rb; //1
     private SpriteRenderer spriteRenderer; //2
     public int CurrentHearts => currentHearts;
+    public int MaxHearts => maxHearts;
 
     [SerializeField] private float invulnerabilityTime = 0.7f;
 

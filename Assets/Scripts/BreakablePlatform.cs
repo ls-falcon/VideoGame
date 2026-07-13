@@ -21,7 +21,11 @@ public class BreakablePlatform : MonoBehaviour
 
     [Header("Break Feedback")]
     [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip warningSound;
+    [SerializeField, Range(0f, 2f)] private float warningSoundVolume = 1f;
+    [SerializeField] private bool loopWarningSound = true;
     [SerializeField] private AudioClip breakSound;
+    [SerializeField, Range(0f, 2f)] private float breakSoundVolume = 1f;
     [SerializeField] private ParticleSystem breakParticles;
 
     [Header("References")]
@@ -33,6 +37,8 @@ public class BreakablePlatform : MonoBehaviour
     private bool isBroken;
     private bool isWarning;
     private Color originalColor;
+    private float originalAudioSourceVolume = 1f;
+    private bool warningSoundPlaying;
     private PlayerMovementController standingPlayer;
 
     private void Awake()
@@ -55,6 +61,11 @@ public class BreakablePlatform : MonoBehaviour
         if (audioSource == null)
         {
             audioSource = GetComponent<AudioSource>();
+        }
+
+        if (audioSource != null)
+        {
+            originalAudioSourceVolume = audioSource.volume;
         }
 
         ConfigureOneWayPlatform();
@@ -196,6 +207,8 @@ public class BreakablePlatform : MonoBehaviour
 
         isWarning = true;
 
+        StartWarningSound();
+
         if (crackedSprite != null)
         {
             spriteRenderer.sprite = crackedSprite;
@@ -210,10 +223,11 @@ public class BreakablePlatform : MonoBehaviour
     {
         isBroken = true;
         ClearStandingPlayer();
+        StopWarningSound();
 
         if (audioSource != null && breakSound != null)
         {
-            audioSource.PlayOneShot(breakSound);
+            audioSource.PlayOneShot(breakSound, breakSoundVolume);
         }
 
         if (breakParticles != null)
@@ -258,6 +272,7 @@ public class BreakablePlatform : MonoBehaviour
     {
         playerStandingTime = 0f;
         isWarning = false;
+        StopWarningSound();
 
         if (spriteRenderer == null || isBroken)
         {
@@ -274,6 +289,35 @@ public class BreakablePlatform : MonoBehaviour
         playerOnPlatform = false;
     }
 
+    private void StartWarningSound()
+    {
+        if (audioSource == null || warningSound == null || warningSoundPlaying)
+        {
+            return;
+        }
+
+        audioSource.Stop();
+        audioSource.clip = warningSound;
+        audioSource.loop = loopWarningSound;
+        audioSource.volume = warningSoundVolume;
+        audioSource.Play();
+        warningSoundPlaying = true;
+    }
+
+    private void StopWarningSound()
+    {
+        if (audioSource == null || !warningSoundPlaying)
+        {
+            return;
+        }
+
+        audioSource.Stop();
+        audioSource.clip = null;
+        audioSource.loop = false;
+        audioSource.volume = originalAudioSourceVolume;
+        warningSoundPlaying = false;
+    }
+
     private void ConfigureOneWayPlatform()
     {
         if (!configureAsOneWayPlatform ||
@@ -287,5 +331,7 @@ public class BreakablePlatform : MonoBehaviour
         platformEffector.useOneWay = true;
         platformEffector.useSideFriction = false;
         platformEffector.useSideBounce = false;
+        platformEffector.surfaceArc = 180f;
+        platformEffector.rotationalOffset = 0f;
     }
 }

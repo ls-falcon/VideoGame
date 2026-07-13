@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b01d2e6b7e02c2c44865f56a771eb006, type: 3}
   m_Name: hardDifficulty
   m_EditorClassIdentifier: Assembly-CSharp::DifficultySettings
+  difficultyName: Hard
   maxInitialHearts: 3
   numberOfRounds: 10
   waves:
